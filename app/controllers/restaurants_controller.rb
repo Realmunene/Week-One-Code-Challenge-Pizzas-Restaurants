@@ -1,17 +1,27 @@
 class RestaurantsController < ApplicationController
 rescue_from ActiveRecord::RecordNotFound, with: :record_not_found_method
     def index
-render json: Restaurant.all
+        
+restaurants = Restaurant.all
+render json: restaurants, status: :ok
 end
 def show
-    restaurant = find_restaurant
-    render json : restaurant
-    private
-    def find_restaurant
-        # to return nill when no record is found 
-        Restaurant.find(id: params[:id])
+    restaurant = Restaurant.find_by!(id: params[:id]
+    render json : restaurant, serializer: PizzaRestaurantSerializer, status: :ok
 end
-    def record_not_found_method
-        render json:{error:"Rest not found"}, status: :not_found
-    end
+def destroy
+    restaurant = find_restaurant
+    restaurant.destroy
+    head :no_content
+  end
+
+  private
+
+  def find_restaurant
+    Restaurant.find(params[:id])
+  end
+
+  def render_not_found_response
+    render json: { error: "Restaurant not found"}, status: :not_found
+  end
 end
